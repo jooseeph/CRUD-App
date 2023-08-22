@@ -1,22 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { EmpAddEditComponent } from './emp-add-edit/emp-add-edit.component';
 import { EmployeeService } from './services/employee.service';
-import { AfterViewInit, ViewChild } from '@angular/core';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { MatSort, MatSortModule } from '@angular/material/sort';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { CoreService } from './core/core.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
+  
 })
 export class AppComponent implements OnInit {
-  title = 'CRUD-App';
   displayedColumns: string[] = [
     'id',
     'firstName',
@@ -34,23 +31,28 @@ export class AppComponent implements OnInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+
   constructor(
     private _dialog: MatDialog,
-    private _empService: EmployeeService,private _coreService:CoreService
+    private _empService: EmployeeService,
+    private _coreService: CoreService
   ) {}
+
   ngOnInit(): void {
     this.getEmployeeList();
   }
+
   openAddEditEmpForm() {
-    const dialogRef =this._dialog.open(EmpAddEditComponent);
+    const dialogRef = this._dialog.open(EmpAddEditComponent);
     dialogRef.afterClosed().subscribe({
-      next:(val)=>{
-        if(val){
-          this.getEmployeeList()
+      next: (val) => {
+        if (val) {
+          this.getEmployeeList();
         }
-      }
-    })
+      },
+    });
   }
+
   getEmployeeList() {
     this._empService.getEmployeeList().subscribe({
       next: (res) => {
@@ -58,11 +60,10 @@ export class AppComponent implements OnInit {
         this.dataSource.sort = this.sort;
         this.dataSource.paginator = this.paginator;
       },
-      error: (err) => {
-        console.error(err);
-      },
+      error: console.log,
     });
   }
+
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
@@ -71,27 +72,28 @@ export class AppComponent implements OnInit {
       this.dataSource.paginator.firstPage();
     }
   }
+
   deleteEmployee(id: number) {
     this._empService.deleteEmployee(id).subscribe({
       next: (res) => {
-        this._coreService.openSnackBar('Employee deleted','Done')
+        this._coreService.openSnackBar('Employee deleted!', 'done');
         this.getEmployeeList();
       },
-      error: (err) => {
-        console.error(err);
-      },
+      error: console.log,
     });
   }
-  openEditForm(data:any) {
-    const dialogRef=this._dialog.open(EmpAddEditComponent,{
+
+  openEditForm(data: any) {
+    const dialogRef = this._dialog.open(EmpAddEditComponent, {
       data,
-    })
+    });
+
     dialogRef.afterClosed().subscribe({
-      next:(val)=>{
-        if(val){
-          this.getEmployeeList()
+      next: (val) => {
+        if (val) {
+          this.getEmployeeList();
         }
-      }
-    })
+      },
+    });
   }
 }
